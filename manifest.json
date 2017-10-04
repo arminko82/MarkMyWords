@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "MarkMyWords",
+  "version": "0.1",
+  "description": "Highlights all occurences of the current text selection.",
+  "minimum_chrome_version": "23",
+  "icons": {
+    "16": "icon_16.png",
+    "128": "icon_128.png"
+  },
+  "app": {
+    "background": {
+      "scripts": ["index.html"]
+    }
+  }
+}
