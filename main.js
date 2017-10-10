@@ -43,10 +43,17 @@ function updateSelection(e) {
 
 function doHighlight(selection) {
 	var replacement = "<mark>" + selection + "</mark>";
-	var matcher = new RegExp(selection, 'g');
-	var elems = document.querySelectorAll(selection), i;
+	var pattern = "[^<](" + selection + ")[^>]";
+	var matcher = new RegExp(pattern, 'g');
+	
+	var node = document.getElementsByTagName('body')[0];
+	var all = node.innerHTML;
+	node.innerHTML = all.replace(pattern, replacement);
+	var newAll  = node.innerHTML;
+	console.log("n");
+	//var elems = document.querySelectorAll(selection), i;
 	// TODO fix matcher
-	for (i = 0; i < elems.length; i++)
-		if (!elems[i].childNodes.length)
-			elems[i].innerHTML = elems[i].innerHTML.replace(matcher, newText);
+	//for (i = 0; i < elems.length; i++)
+	//	if (!elems[i].childNodes.length)
+	//		elems[i].innerHTML = elems[i].innerHTML.replace(matcher, newText);
 }
