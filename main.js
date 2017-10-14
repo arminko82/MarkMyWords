@@ -48,14 +48,24 @@ function makeHighNode(text) {
 	return markNode;
 }
 
+// there is no slice on non array-type returned by getElementsByTagName
+function getShallowElementsCopy() {
+	var elements = document.body.getElementsByTagName("*");
+	var array = new Array(elements.length);
+	for(i = 0; i < elements.length;i++)
+		array[i] = elements[i];
+	return array;
+}
+
 function doHighlight(selection) {
 	var replacement = "<mark>" + selection + "</mark>";
 	//var pattern = "[^<](" + selection + ")[^>]"; // omit tags
 	var pattern = selection; 
 	var matcher = new RegExp(pattern, 'g');
 	
-	var items = document.body.getElementsByTagName("*").slice();
-	for (item in items) {
+	var items = getShallowElementsCopy();
+	for (i in items) {
+		var item = items[i];
 		var c = item.firstChild;
 		if(c == null)
 			continue; // never happens? set bb
