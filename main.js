@@ -41,16 +41,44 @@ function updateSelection(e) {
 	console.log("Text: " + getSelectionText());
 }
 
+function makeHighNode(text) {
+	var markNode = document.createElement("mark");
+	var markText = document.createTextNode(text);
+	markNode.appendChild(markText);
+	return markNode;
+}
+
 function doHighlight(selection) {
 	var replacement = "<mark>" + selection + "</mark>";
-	var pattern = "[^<](" + selection + ")[^>]";
+	//var pattern = "[^<](" + selection + ")[^>]"; // omit tags
+	var pattern = selection; 
 	var matcher = new RegExp(pattern, 'g');
 	
-	var node = document.getElementsByTagName('body')[0];
+	var items = document.body.getElementsByTagName("*").slice();
+	for (item in items) {
+		var c = item.firstChild;
+		if(c == null)
+			continue; // never happens? set bb
+		var val = c.nodeValue;
+		if (val != null && typeof val === 'string' || val instanceof String) {
+			// assume single child now
+			var splits = val.split(pattern);
+			if(splits.length == 1)
+				continue; // no highlight in this node
+			c.nodeValue = splits[0];
+			var highNode = makeHighNode(selection);
+			for(i = 1; i < splits.length; i++) {
+				item.appendChild(highNode);
+				item.appendChild(document.createTextNode(splits[i]));
+			}			
+			//c.nodeValue = c.nodeValue.replace(pattern, replacement);
+		}
+	}
+/*	var node = document.getElementsByTagName('body')[0];
 	var all = node.innerHTML;
 	node.innerHTML = all.replace(pattern, replacement);
 	var newAll  = node.innerHTML;
-	console.log("n");
+	console.log("n"); */
 	//var elems = document.querySelectorAll(selection), i;
 	// TODO fix matcher
 	//for (i = 0; i < elems.length; i++)
