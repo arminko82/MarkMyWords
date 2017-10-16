@@ -27,7 +27,7 @@ function clearHighlights() {
 function updateSelection(e) {
 	var selection = window.getSelection(); 
 	var text = selection.toString();
-	if (text === "" || text === _lastText)
+	if (text === "" || text === _lastText || text.match(/\s+/g))
 		return;
 	_lastText = text;
 	clearHighlights();
@@ -46,7 +46,7 @@ function doHighlight(selection) {
 		if (val == null || typeof val !== 'string')
 			continue;
 		var splits = val.split(selection);
-		if(splits.length == 1)
+		if(splits.length == 1 && splits[0] === selection)
 			continue; // no highlight in this node
 		changeNode(child, selection, splits);
 	}
