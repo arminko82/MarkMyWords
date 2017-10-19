@@ -1,4 +1,5 @@
 # MarkMyWords
+
 By Armin Koefler, 29.09.2017
 
 A chrome extension for highlighting all occurrences of the currently selected word(s).
