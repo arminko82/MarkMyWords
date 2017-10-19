@@ -1,10 +1,12 @@
 "use strict";
 
 // global init
-if (document.readyState === 'loading') {
-	document.addEventListener('DOMContentLoaded', afterDOMLoaded);
-} else {
-	afterDOMLoaded();
+if(typeof document !== 'undefined') { // not defined in test env
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', afterDOMLoaded);
+	} else {
+		afterDOMLoaded();
+	}
 }
 
 // selection detector init
@@ -48,6 +50,7 @@ function doHighlight(selection) {
 		var splits = val.split(selection);
 		if(splits.length == 1 && splits[0] === selection)
 			continue; // no highlight in this node
+		//mHighlights[] // save old node
 		changeNode(child, selection, splits);
 	}
 }
@@ -56,10 +59,7 @@ function changeNode(node, selection, splits ) {
 	var highNode = makeMarkNode(selection);
 	var master = node.parentNode;
 	var textFragment = splits[0];
-	if(textFragment.length > 0)
-		node.nodeValue = textFragment;
-	else
-		master.removeChild(node);
+	node.nodeValue = textFragment.length > 0 ? textFragment : "";
 	for (var i = 1; i < splits.length; i++) {
 		master.appendChild(highNode);
 		textFragment = splits[i];
@@ -83,3 +83,5 @@ function getShallowElementsCopy() {
 		array[i] = elements[i];
 	return array;
 }
+
+module.exports = MarkMyWords;

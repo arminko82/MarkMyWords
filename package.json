@@ -4,7 +4,7 @@
   "description": "By Armin Koefler, 29.09.2017",
   "main": "main.js",
   "scripts": {
-    "test": "mocha --reporter=nyan tests/main-spec.js"
+    "test": "mocha --reporter=nyan test/main-spec.js"
   },
   "repository": {
     "type": "git",
