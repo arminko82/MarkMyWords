@@ -4,13 +4,13 @@ var expect = require('chai').expect;
 var assert = require('chai').assert;
 var cheerio = require('cheerio');
 var fs = require('fs');
+var mmw = require('../main.js');
 
 var htmlFiles = {};
 
 describe('MarkMyWords', function() {
     it('should exist', function() {
-        var MarkMyWords = require('../main.js');
-        expect(MarkMyWords).to.not.be.undefined;
+        expect(mmw).to.not.be.undefined;
     });
 });
 
@@ -25,11 +25,11 @@ describe('ReadTestFiles', function () {
 	});
 });
 
-describe('MarkupCreation', function() {
+describe('MarkUpCreation', function() {
     it('should make a highlighted version of a text', function() {
         var input = "Foo";
         var expected = "<mark>Foo</mark";
-        var actual = makeMarkNode(input);
+        var actual = mmw.makeMarkNode(input);
         expect(expected === actual).to.be.true;
     });
 });
