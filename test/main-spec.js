@@ -1,5 +1,7 @@
 "use strict";
 
+require('jsdom-global')()
+
 var expect = require('chai').expect;
 var assert = require('chai').assert;
 var cheerio = require('cheerio');
@@ -28,9 +30,11 @@ describe('ReadTestFiles', function () {
 describe('MarkUpCreation', function() {
     it('should make a highlighted version of a text', function() {
         var input = "Foo";
-        var expected = "<mark>Foo</mark";
-        var actual = mmw.makeMarkNode(input);
-        expect(expected === actual).to.be.true;
+        var expected = "<mark>Foo</mark>";
+        var actual = mmw.makeMarkNode(input).outerHTML;
+        var equal = expected == actual;
+        assert(equal, actual + " VS " + expected);
+        expect(equal).to.be.true;
     });
 });
 
