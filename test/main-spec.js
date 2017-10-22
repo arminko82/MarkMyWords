@@ -48,6 +48,41 @@ describe('ShallowDomElementsCopy', function() {
     });
 });
 
+describe('SplitOriginalStrings', function() {
+    it('should take some string that is the split by a selection word', function() {
+		var selection = "world";
+		var inputs = [ 
+			"Hello world", 
+			"Hello my world", 
+			"Hello my world.", 
+			"Hello world, this is my world", 
+			"world, oh Hello world", 
+			" my world",
+			"world",
+			"worldworld"];
+		var splits = [ 
+			["Hello ", null],
+			["Hello my ", null], 
+			["Hello my ", null, "."], 
+			["Hello ", null, ", this is my ", null], 
+			[null, ", oh Hello ", null], 
+			[" my ", null], 
+			[null], 
+			[null, null]];
+		assert(inputs.length === splits.length, "Test data error");
+    
+		for(var i = 0; i < inputs.length; i++) {
+			var input = inputs[i];
+	        var expected = splits[i];
+	        var actual = mmw.splitOriginal(input, selection);
+	        	expect(input).to.equal(actual.raw);
+	        	expect(expected).to.deep.equal(actual.out);
+		}
+		expect(mmw.splitOriginal("keinewelt", selection)).to.be.null;
+		expect(mmw.splitOriginal("", selection)).to.be.null;
+    });
+});
+
 describe('MarkUpSingleNodeText', function() {
     it('should take a single html node and apply the highlight on it', function() {
 		var highlight = "world";
@@ -59,24 +94,20 @@ describe('MarkUpSingleNodeText', function() {
 			"<p>Hello <mark>world</mark></p>", 
 			"<p>Hello my <mark>world</mark></p>", 
 			"<p></p><!-- is the child of this p null? -->"];
-
-		assert(inputs.length !== outputs.length, "Test data error");
+		var splits = [ 
+			["Hello ", ""],
+			["Hello my ", ""], 
+			[]];
+		assert(inputs.length === outputs.length, "Test data error");
+		assert(inputs.length === splits.length, "Test data error");
     
-        var p = document.createElement('p');
-        var text = document.createTextNode("Hello ");
-        var mark = document.createElement('mark');
-        var markText = document.createTextNode(highlight);
-        mark.appendChild(markText);
-        p.appendChild(text);
-        p.appendChild(mark);
-
-		var input = "<p>Hello " + highlight + "</p>";
-        document.body.innerHTML = input;
-        var expected = p.outerHTML;
-        mmw.changeNode(document.body.firstChild, highlight, ["Hello ", highlight]);
-        var actual = document.body.innerHTML;
-        
-        expect(expected).to.equal(actual);
+		for(var i = 0; i < inputs.length; i++) {
+	        document.body.innerHTML = inputs[i];
+	        var expected = outputs[i];
+	        mmw.changeNode(document.body.firstChild, highlight, splits[i]);
+	        var actual = document.body.innerHTML;
+	        expect(expected).to.equal(actual);
+		}
     });
 });
 

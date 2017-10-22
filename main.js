@@ -1,15 +1,8 @@
 "use strict";
 
 class MarkMyWords {
-	// define class member
-	constructor() {
-	//	MarkMyWords._lastText = "";
-	//	MarkMyWords._highlights = {};
-	}
-
 	// Remove highlight nodes on refresh TODO
 	static clearHighlights() {
-		var shit = 'shat';
 		// for (tag in this._highlights) {
 		// console.log(tag.Parent);
 		// }
@@ -31,30 +24,54 @@ class MarkMyWords {
 	static doHighlight(selection) {
 		for (var item of MarkMyWords.getShallowElementsCopy()) {
 			var child = item.firstChild;
-			if(child == null)
+			if(child === null)
 				continue; // empty tag
-			var val = child.nodeValue;
-			if (val == null || typeof val !== 'string')
+			var splits = MarkMyWords.splitOriginal(child.nodeValue, selection);
+			if(splits === null)
 				continue;
-			var splits = val.split(selection);
-			if(splits.length == 1 && splits[0] === selection)
-				continue; // no highlight in this node
-			// this._highlights[] // save old node
-			MarkMyWords.changeNode(child, selection, splits);
+			this._highlights.push({ parent: item, orignal: splits.raw});
+			MarkMyWords.changeNode(child, selection, splits.out);
 		}
 	}
+
+	/**
+	 * If input is a string (among html nodes) split it by selection.
+	 * @return: null on nothing, array of substring, the place of each 
+	 * entry being null is place for marked text afterwards.
+	 */
+	static splitOriginal(val, selection) {
+		if (val == null || typeof val !== 'string')
+			return null;
+		var indices = [];
+		var i = -1;
+		while((i = val.indexOf(selection, i + 1) ) >= 0)
+			indices.push(i);
+		if(indices.length == 0)
+			return null;
+		var result = [];
+		var index = 0;
+		for(var i = 0; i < indices.length; i++) {
+			result.push(val.substring(index, indices[i]));
+			result.push(null); // signal placeholder for highlight
+			index = indices[i] + selection.length;
+		}
+		if(index < val.length)
+			result.push(val.substring(index));
+		return { raw: val, out: result };
+	}
 	
+	/**
+	 * Alters a text node by replacing it by a series of nodes
+	 * specified by splits. Each null in splits becomes a mark subnode,
+	 * the rest texts.
+	 */
 	static changeNode(node, selection, splits ) {
 		var highNode = MarkMyWords.makeMarkNode(selection);
 		var master = node.parentNode;
-		var textFragment = splits[0];
-		node.nodeValue = textFragment.length > 0 ? textFragment : "";
-		for (var i = 1; i < splits.length; i++) {
-			master.appendChild(highNode);
-			textFragment = splits[i];
-			if(textFragment.length > 0)
-				master.appendChild(document.createTextNode(textFragment));
-		}			
+		master.removeChild(node);
+		for(var item of splits) {
+			master.appendChild(item == null ? highNode : document.createTextNode(item));
+		}
 	}
 	
 	static makeMarkNode(text) {
@@ -73,7 +90,7 @@ class MarkMyWords {
 		return array;
 	}
 } // end class
-MarkMyWords._highlights = {};
+MarkMyWords._highlights = [];
 MarkMyWords._lastText = "";
 
 
