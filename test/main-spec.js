@@ -21,20 +21,18 @@ describe('ReadTestFiles', function () {
 	it('should be able to read and buffer html files for next tests', function() {
 		for (var fileName of fileNames) {
 			var file = fs.readFileSync('test/' + fileName)
-			expect(file.length > 0).to.be.true;
+			expect(file.length).to.be.above(0);
 			htmlFiles[fileName] = file;
 		}
 	});
 });
 
 describe('MarkUpCreation', function() {
-    it('should make a highlighted version of a text', function() {
+    it('should make a highlighted version of a text as HTLM fragment', function() {
         var input = "Foo";
-        var expected = "<mark>Foo</mark>";
+        var expected = "<mark>" + input + "</mark>";
         var actual = mmw.makeMarkNode(input).outerHTML;
-        var equal = expected === actual;
-        assert(equal, actual + " VS " + expected);
-        expect(equal).to.be.true;
+        expect(actual).to.equal(expected);
     });
 });
 
