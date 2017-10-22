@@ -32,7 +32,7 @@ describe('MarkUpCreation', function() {
         var input = "Foo";
         var expected = "<mark>Foo</mark>";
         var actual = mmw.makeMarkNode(input).outerHTML;
-        var equal = expected == actual;
+        var equal = expected === actual;
         assert(equal, actual + " VS " + expected);
         expect(equal).to.be.true;
     });
