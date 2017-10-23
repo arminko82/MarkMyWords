@@ -59,7 +59,10 @@ describe('SplitOriginalStrings', function() {
 			"world, oh Hello world", 
 			" my world",
 			"world",
-			"worldworld"];
+			"worldworld", 
+			"world world",
+			"world\tworld",
+			"worldworldworldworld"];
 		var splits = [ 
 			["Hello ", null],
 			["Hello my ", null], 
@@ -68,7 +71,10 @@ describe('SplitOriginalStrings', function() {
 			[null, ", oh Hello ", null], 
 			[" my ", null], 
 			[null], 
-			[null, null]];
+			[null, null],
+			[null, " ", null],
+			[null, "\t", null],
+			[null, null, null, null]];
 		assert(inputs.length === splits.length, "Test data error");
     
 		for(var i = 0; i < inputs.length; i++) {

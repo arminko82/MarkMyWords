@@ -50,8 +50,15 @@ class MarkMyWords {
 			return null;
 		var result = [];
 		var index = 0;
-		for(var i = 0; i < indices.length; i++) {
-			result.push(val.substring(index, indices[i]));
+		var i = 0;
+		if(indices[0] == 0) {
+			result.push(null); // val began with selection
+			index = selection.length;
+			i = 1;
+		}
+		for(i; i < indices.length; i++) {
+			if(index != indices[i])
+				result.push(val.substring(index, indices[i]));
 			result.push(null); // signal placeholder for highlight
 			index = indices[i] + selection.length;
 		}
