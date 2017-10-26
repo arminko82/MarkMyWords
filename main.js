@@ -22,7 +22,7 @@ class MarkMyWords {
 	}
 	
 	static doHighlight(selection) {
-		for (var item of MarkMyWords.getShallowElementsCopy()) {
+		for (var item of MarkMyWords.getShallowElementsCopy(document.body)) {
 			var child = item.firstChild;
 			if(child === null)
 				continue; // empty tag
@@ -93,8 +93,8 @@ class MarkMyWords {
 	}
 	
 	// there is no slice on non array-type returned by getElementsByTagName
-	static getShallowElementsCopy() {
-		var elements = document.body.getElementsByTagName("*");
+	static getShallowElementsCopy(node) {
+		var elements = node.getElementsByTagName("*");
 		var array = new Array(elements.length);
 		for(var i = 0; i < elements.length;i++)
 			array[i] = elements[i];

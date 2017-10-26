@@ -8,18 +8,31 @@ var _fileNames = ['tdd1.html', 'tdd1b.html'].map(function (f) { return "test/" +
 var _htmlFiles = {};
 
 describe('MarkMyWords', function() {
-    it('should exist', function() {
-        expect(mmw).to.not.be.undefined;
-    });
+	it('should exist', function() {
+		expect(mmw).to.not.be.undefined;
+	});
+});
+
+describe('ShallowDomElementsCopy', function() {
+	it('should create a shallow copy of all DOM nodes below my-root node in given document\'s body', function() {
+		var input = ["<p>Hello world</p>", "<p>Hello my world</p>", "<p></p>"];
+		var root =  document.getElementById("my-root");
+		root.innerHTML = input.join();
+		var expected = input;
+		var actual = mmw.getShallowElementsCopy(root);
+		var actualStrings = actual.map(x => x.outerHTML);
+		expect(actual).to.have.lengthOf(input.length);
+		expect(actualStrings).to.deep.equal(expected);
+	});
 });
 
 describe('MarkUpCreation', function() {
-    it('should make a highlighted version of a text as HTLM fragment', function() {
-        var input = "Foo";
-        var expected = "<mark>" + input + "</mark>";
-        var actual = mmw.makeMarkNode(input).outerHTML;
-        expect(actual).to.equal(expected);
-    });
+	it('should make a highlighted version of a text as HTLM fragment', function() {
+		var input = "Foo";
+		var expected = "<mark>" + input + "</mark>";
+		var actual = mmw.makeMarkNode(input).outerHTML;
+		expect(actual).to.equal(expected);
+	});
 });
 
 /*
@@ -52,7 +65,7 @@ describe('SplitOriginalStrings', function() {
 			[null, "\t", null],
 			[null, null, null, null]];
 		assert(inputs.length === splits.length, "Test data error");
-    
+
 		for(var i = 0; i < inputs.length; i++) {
 			var input = inputs[i];
 	        var expected = splits[i];
@@ -82,7 +95,7 @@ describe('MarkUpSingleNodeText', function() {
 			null];
 		assert(inputs.length === outputs.length, "Test data error");
 		assert(inputs.length === splits.length, "Test data error");
-    
+
 		for(var i = 0; i < inputs.length; i++) {
 			var dom = new JSDOM(inputs[i]);
 			var doc = dom.window.document;
@@ -103,4 +116,4 @@ describe('MarkWorldInTdd1', function () {
 		var actual = todo
 	});
 });
-*/
+ */

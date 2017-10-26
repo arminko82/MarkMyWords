@@ -48,7 +48,7 @@ describe('ShallowDomElementsCopy', function() {
     		var input = ["<p>Hello world</p>", "<p>Hello my world</p>", "<p></p>"];
         document.body.innerHTML = input.join(); // document from jsdom-global
         var expected = input;
-        var actual = mmw.getShallowElementsCopy();
+        var actual = mmw.getShallowElementsCopy(document.body);
         var actualStrings = actual.map(x => x.outerHTML);
         expect(actual).to.have.lengthOf(input.length);
         expect(actualStrings).to.deep.equal(expected);
