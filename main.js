@@ -116,7 +116,6 @@ if(typeof document !== 'undefined') { // not defined in test env
 
 // selection detector init
 function afterDOMLoaded() {
-	//var mmw = new MarkMyWords();
 	document.addEventListener("mouseup", MarkMyWords.updateSelection);
 	document.addEventListener("dblclick", MarkMyWords.updateSelection);
 }

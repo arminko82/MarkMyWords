@@ -95,34 +95,3 @@ describe('SplitOriginalStrings', function() {
 		expect(mmw.splitOriginal("", selection)).to.be.null;
     });
 });
-
-describe('MarkUpSingleNodeText', function() {
-    it('should take a single html node and apply the highlight on it', function() {
-		var highlight = "world";
-		var inputs = [ 
-			"<p>Hello world</p>", 
-			"<p>Hello my world</p>", 
-			"<p></p><!-- is the child of this p null? -->"];
-		var outputs = [ 
-			"<p>Hello <mark>world</mark></p>", 
-			"<p>Hello my <mark>world</mark></p>", 
-			"<p></p><!-- is the child of this p null? -->"];
-		var splits = [ 
-			["Hello ", null],
-			["Hello my ", null], 
-			null];
-		assert(inputs.length === outputs.length, "Test data error");
-		assert(inputs.length === splits.length, "Test data error");
-    
-		for(var i = 0; i < inputs.length; i++) {
-			var dom = new JSDOM(inputs[i]);
-			var doc = dom.window.document;
-	        var expected = outputs[i];
-	        var node = doc.querySelector("p");
-	        console.log(doc);
-	        mmw.changeNode(node, highlight, splits[i], doc);
-	        var actual = node.outerHTML;
-	        expect(expected).to.equal(actual);
-		}
-    });
-});
