@@ -73,13 +73,17 @@ class MarkMyWords {
 	 * the rest texts.
 	 */
 	static changeNode(node, selection, splits, dom) {
+		if(node == null || node.parentNode == null)
+			return;
 		if(dom == null)
 			dom = document;
-		var highNode = MarkMyWords.makeMarkNode(selection, dom);
 		var master = node.parentNode;
 		master.removeChild(node);
 		for(var item of splits) {
-			master.appendChild(item == null ? highNode : dom.createTextNode(item));
+			var entity = item == null ? 
+				MarkMyWords.makeMarkNode(selection, dom) : 
+				dom.createTextNode(item)
+			master.appendChild(entity);
 		}
 	}
 	
