@@ -72,18 +72,22 @@ class MarkMyWords {
 	 * specified by splits. Each null in splits becomes a mark subnode,
 	 * the rest texts.
 	 */
-	static changeNode(node, selection, splits ) {
-		var highNode = MarkMyWords.makeMarkNode(selection);
+	static changeNode(node, selection, splits, dom) {
+		if(dom == null)
+			dom = document;
+		var highNode = MarkMyWords.makeMarkNode(selection, dom);
 		var master = node.parentNode;
 		master.removeChild(node);
 		for(var item of splits) {
-			master.appendChild(item == null ? highNode : document.createTextNode(item));
+			master.appendChild(item == null ? highNode : dom.createTextNode(item));
 		}
 	}
 	
-	static makeMarkNode(text) {
-		var markNode = document.createElement("mark");
-		var markText = document.createTextNode(text);
+	static makeMarkNode(text, dom) {
+		if(dom == null)
+			dom = document;
+		var markNode = dom.createElement("mark");
+		var markText = dom.createTextNode(text);
 		markNode.appendChild(markText);
 		return markNode;
 	}
