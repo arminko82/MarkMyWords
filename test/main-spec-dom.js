@@ -1,19 +1,8 @@
 "use strict";
 
-var mmw = require('../main.js');
-
-if(typeof document === "undefined") {	// tdd
-	require('jsdom-global')()
-	const jsdom = require('jsdom');
-	const { JSDOM } = jsdom;
-	var expect = require('chai').expect;
-	var assert = require('chai').assert;
-	var cheerio = require('cheerio');
-	var fs = require('fs');
-} else {									// bdd
-	console.log(location.href);
-} 
-
+var expect = chai.expect;
+var assert = chai.assert;
+var mmw = MarkMyWords;
 
 var _fileNames = ['tdd1.html', 'tdd1b.html'].map(function (f) { return "test/" + f});
 var _htmlFiles = {};
@@ -22,16 +11,6 @@ describe('MarkMyWords', function() {
     it('should exist', function() {
         expect(mmw).to.not.be.undefined;
     });
-});
-
-describe('ReadTestFiles', function () {
-	it('should be able to read and buffer html files for next tests', function() {
-		for (var fileName of _fileNames) {
-			var file = fs.readFileSync(fileName)
-			expect(file.length).to.be.above(0);
-			_htmlFiles[fileName] = file;
-		}
-	});
 });
 
 describe('MarkUpCreation', function() {
@@ -46,6 +25,9 @@ describe('MarkUpCreation', function() {
 describe('ShallowDomElementsCopy', function() {
     it('should create a shallow copy of all DOM nodes in given document\'s body', function() {
     		var input = ["<p>Hello world</p>", "<p>Hello my world</p>", "<p></p>"];
+    		
+    		bdd error here, how do i check changes on DOM in browser based debug?
+    		
         document.body.innerHTML = input.join(); // document from jsdom-global
         var expected = input;
         var actual = mmw.getShallowElementsCopy();
@@ -54,6 +36,8 @@ describe('ShallowDomElementsCopy', function() {
         expect(actualStrings).to.deep.equal(expected);
     });
 });
+
+/*
 
 describe('SplitOriginalStrings', function() {
     it('should take some string that is the split by a selection word', function() {
@@ -126,3 +110,12 @@ describe('MarkUpSingleNodeText', function() {
 		}
     });
 });
+
+describe('MarkWorldInTdd1', function () {
+	it('change tdd1 to tdd1b on using highlight function', function() {
+		var input = _htmlFiles['tdd1.html'];
+		var expected = _htmlFiles['tdd1b.html'];
+		var actual = todo
+	});
+});
+*/

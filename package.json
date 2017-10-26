@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/arminko82/MarkMyWords#readme",
   "devDependencies": {
+  	"chai" : "*",
+  	"mocha": "*",
     "jsdom": "11.3.0",
     "jsdom-global": "3.0.2",
     "mocha-jsdom": "^1.1.0"

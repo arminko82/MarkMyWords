@@ -1,0 +1,21 @@
+<html>
+	<head>
+		<title>Mocha based test.</title>
+		<link rel="stylesheet" href="../node_modules/mocha/mocha.css">
+	</head>
+	<body>
+		<div id="mocha"></div>
+		<div id="messages"></div>
+  		<div id="fixtures"></div>
+
+		<script src="../node_modules/chai/chai.js"></script>
+		<script src="../node_modules/mocha/mocha.js"></script>
+		
+		<script>mocha.setup('bdd')</script>
+		<script src="../main.js"></script>
+
+		<script src="main-spec-dom.js"></script>
+		
+		<script>	mocha.run();	</script>
+</body>
+</html>
