@@ -37,7 +37,7 @@ describe('MarkUpCreation', function() {
 });
 
 describe('SplitOriginalStrings', function() {
-    it('should take some string that is the split by a selection word', function() {
+	it('should take some string that is the split by a selection word', function() {
 		var selection = "world";
 		var inputs = [ 
 			"Hello world", 
@@ -67,19 +67,19 @@ describe('SplitOriginalStrings', function() {
 
 		for(var i = 0; i < inputs.length; i++) {
 			var input = inputs[i];
-	        var expected = splits[i];
-	        var actual = mmw.splitOriginal(input, selection);
-	        	expect(input).to.equal(actual.raw);
-	        	expect(expected).to.deep.equal(actual.out);
+			var expected = splits[i];
+			var actual = mmw.splitOriginal(input, selection);
+			expect(input).to.equal(actual.raw);
+			expect(expected).to.deep.equal(actual.out);
 		}
 		expect(mmw.splitOriginal("keinewelt", selection)).to.be.null;
 		expect(mmw.splitOriginal("", selection)).to.be.null;
-    });
+	});
 });
 
 
 describe('MarkUpSingleNodeText', function() {
-    it('should take a single html node and apply the highlight on it', function() {
+	it('should take a single html node and apply the highlight on it', function() {
 		var highlight = "world";
 		var inputs = [ 
 			"<p>Hello world</p>", 
@@ -104,22 +104,20 @@ describe('MarkUpSingleNodeText', function() {
 
 		for(var i = 0; i < inputs.length; i++) {
 			root.innerHTML = inputs[i];
-	        var expected = outputs[i];
-	        var p = root.firstChild;
-	        var node = p.firstChild;
-	        mmw.changeNode(node, highlight, splits[i]);
-	        var actual = p.outerHTML;
-	        expect(expected).to.equal(actual);
+			var expected = outputs[i];
+			var p = root.firstChild;
+			var node = p.firstChild;
+			mmw.changeNode(node, highlight, splits[i]);
+			var actual = p.outerHTML;
+			expect(expected).to.equal(actual);
 		}
-    });
+	});
 });
 
-/*
-describe('MarkWorldInTdd1', function () {
+describe('RestoreUncheckedState', function () {
 	it('change tdd1 to tdd1b on using highlight function', function() {
 		var input = _htmlFiles['tdd1.html'];
 		var expected = _htmlFiles['tdd1b.html'];
 		var actual = todo
 	});
 });
- */

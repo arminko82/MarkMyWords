@@ -1,11 +1,14 @@
 "use strict";
 
 class MarkMyWords {
-	// Remove highlight nodes on refresh TODO
+
 	static clearHighlights() {
-		// for (tag in this._highlights) {
-		// console.log(tag.Parent);
-		// }
+		for(master of MarkMyWords._highlights) {
+			while(master.lastChild)
+				master.removeChild(master.lastChild);
+			master.appendChild(MarkMyWords._highlights[master]);
+		}
+		MarkMyWords._highlights = [];
 	}
 	
 	static updateSelection(e) {
@@ -79,6 +82,7 @@ class MarkMyWords {
 			dom = document;
 		var master = node.parentNode;
 		master.removeChild(node);
+		MarkMyWords._highlights[master] = node;
 		for(var item of splits) {
 			var entity = item == null ? 
 				MarkMyWords.makeMarkNode(selection, dom) : 
