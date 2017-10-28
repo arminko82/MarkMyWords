@@ -3,10 +3,14 @@
 class MarkMyWords {
 
 	static clearHighlights() {
-		for(master of MarkMyWords._highlights) {
+		if(MarkMyWords._highlights.length == 0)
+			return;
+		for(var tuple of MarkMyWords._highlights) {
+			var master = tuple.parent;
+			var original = tuple.original;
 			while(master.lastChild)
 				master.removeChild(master.lastChild);
-			master.appendChild(MarkMyWords._highlights[master]);
+			master.appendChild(document.createTextNode(original));
 		}
 		MarkMyWords._highlights = [];
 	}
@@ -32,7 +36,7 @@ class MarkMyWords {
 			var splits = MarkMyWords.splitOriginal(child.nodeValue, selection);
 			if(splits === null)
 				continue;
-			this._highlights.push({ parent: item, orignal: splits.raw});
+			this._highlights.push({ parent: item, original: splits.raw});
 			MarkMyWords.changeNode(child, selection, splits.out);
 		}
 	}
