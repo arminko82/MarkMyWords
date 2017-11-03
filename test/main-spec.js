@@ -35,7 +35,7 @@ describe('ReadTestFiles', function () {
 });
 
 describe('MarkUpCreation', function() {
-    it('should make a highlighted version of a text as HTLM fragment', function() {
+    it('should make a highlighted version of a text as HTML fragment', function() {
         var input = "Foo";
         var expected = "<mark>" + input + "</mark>";
         var actual = mmw.makeMarkNode(input).outerHTML;

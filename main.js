@@ -1,5 +1,7 @@
 "use strict";
 
+const ENABLED_ID = "mmw-enabled";
+
 /**
  * Encompasses all of the highligh logic and DOM manipulation.
  */
@@ -24,11 +26,20 @@ class MarkMyWords {
 	}
 	
 	/**
+	 * Tells if the extension is currently enablde based on user configuration.
+	 */
+	static isEnabled() {
+		return localStorage[ENABLED_ID] === "true";
+	}
+	
+	/**
 	 * Either does a new selection, changes the selection or reacts un unselection.
 	 * Restores the original state before the last selection update and applies
 	 * the new highlights according to the new selection.
 	 */
 	static updateSelection(e) {
+		if(!MarkMyWords.isEnabled())
+			return;
 		var selection = window.getSelection(); 
 		var text = selection.toString();
 		if (text === "" || text === this._lastText || text.match(/\s+/g))

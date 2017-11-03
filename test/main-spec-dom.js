@@ -28,7 +28,7 @@ describe('ShallowDomElementsCopy', function() {
 });
 
 describe('MarkUpCreation', function() {
-	it('should make a highlighted version of a text as HTLM fragment', function() {
+	it('should make a highlighted version of a text as HTML fragment', function() {
 		var input = "Foo";
 		var expected = "<mark>" + input + "</mark>";
 		var actual = mmw.makeMarkNode(input).outerHTML;
@@ -113,6 +113,23 @@ describe('MarkUpSingleNodeText', function() {
 		}
 	});
 });
+
+describe('RespectConfiguration', function () {
+	it('should not react on changes if the extension is deactivated', function() {
+		var states = [true, false, true].map(function(b) { return b.toString();});
+
+		var originalState = localStorage[ENABLED_ID];
+		for(var i = 0; i < states.length; i++) {
+			var input = states[i];
+			var expected = states[i];
+			localStorage[ENABLED_ID] = input;
+			var actual = MarkMyWords.isEnabled().toString();
+			expect(expected).to.equal(actual);
+		}
+		localStorage[ENABLED_ID] = originalState;
+	});
+});
+
 
 describe('RestoreUncheckedState', function () {
 	it('change tdd1 to tdd1b on using highlight function', function() {
