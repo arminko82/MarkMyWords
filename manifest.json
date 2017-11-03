@@ -13,5 +13,6 @@
       "matches": ["<all_urls>"],
       "js": ["main.js"]
     }
-  ]
+  ],
+  "options_page": "index.html"
 }
