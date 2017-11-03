@@ -1,7 +1,13 @@
 "use strict";
 
+/**
+ * Encompasses all of the highligh logic and DOM manipulation.
+ */
 class MarkMyWords {
 
+	/**
+	 * Undoes previous highlight by restoring node states.
+	 */
 	static clearHighlights() {
 		if(MarkMyWords._highlights.length == 0)
 			return;
@@ -15,6 +21,11 @@ class MarkMyWords {
 		MarkMyWords._highlights = [];
 	}
 	
+	/**
+	 * Either does a new selection, changes the selection or reacts un unselection.
+	 * Restores the original state before the last selection update and applies
+	 * the new highlights according to the new selection.
+	 */
 	static updateSelection(e) {
 		var selection = window.getSelection(); 
 		var text = selection.toString();
@@ -28,6 +39,9 @@ class MarkMyWords {
 		selection.addRange(range);
 	}
 	
+	/**
+	 * Determines what to highlight and invokes the node changes.
+	 */
 	static doHighlight(selection) {
 		for (var item of MarkMyWords.getShallowElementsCopy(document.body)) {
 			var child = item.firstChild;
@@ -95,6 +109,9 @@ class MarkMyWords {
 		}
 	}
 	
+	/**
+	 * Creates an highlight node with given text.
+	 */
 	static makeMarkNode(text, dom) {
 		if(dom == null)
 			dom = document;
@@ -112,7 +129,7 @@ class MarkMyWords {
 			array[i] = elements[i];
 		return array;
 	}
-} // end class
+} // end class MarkMyWords
 MarkMyWords._highlights = [];
 MarkMyWords._lastText = "";
 
