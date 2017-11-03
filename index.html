@@ -2,39 +2,16 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Mark My Words Options</title>
-    <link href="styles/main.css" rel="stylesheet">
+    <title>MMW Options</title>
+    <!--<link href="styles/main.css" rel="stylesheet">-->
 </head>
 <body>
-    <h1>On selection of any text on the current page highlight all identical occurances.</h1>
+    <h1>Mark My Words - Options</h1>
+    <p>On selection of any text on the current page highlight all identical occurances.<p>
     <br>
-    <input id="mmw-enabled" type="checkbox" value="Active" >
+    <input id="mmw-enabled" type="checkbox"> <label for="mmw-enabled">Active</label>
     <br>
     <div id="canvas" style="font-weight: bold;text-align: center"></div>
-    <script>
-	    var Options;
-	    (function (Options) {
-	    		var id = "mmw-enabled";
-	        var storeKey = id;
-	        var checkbox = document.getElementById(id);
-	        restoreState();
-	        checkbox.onclick = saveState;
-	
-	        function restoreState() {
-	            if (localStorage[storeKey] !== undefined) {
-	                checkbox.checked = localStorage[storeKey] === "true";
-	            }
-	        }
-	
-	        function saveState() {
-	        		localStorage[storeKey] = checkbox.checked.toString();	
-	            var status = document.getElementById("canvas");
-	            status.innerHTML = "Stored";
-	            setTimeout(function () {
-	                status.innerHTML = "";
-	            }, 1000);
-	        }
-	    })(Options || (Options = {}));
-	</script>
+    <script src="index.js"></script>
 </body>
 </html>
