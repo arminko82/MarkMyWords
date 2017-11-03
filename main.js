@@ -13,6 +13,8 @@ class MarkMyWords {
 			return;
 		for(var tuple of MarkMyWords._highlights) {
 			var master = tuple.parent;
+			if(master.parentNode === null)
+				continue; // master not part of DOM anymore
 			var original = tuple.original;
 			while(master.lastChild)
 				master.removeChild(master.lastChild);
