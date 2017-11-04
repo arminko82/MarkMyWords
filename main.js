@@ -24,34 +24,30 @@ class MarkMyWords {
 		}
 		MarkMyWords._highlights = [];
 	}
-	
-	/**
-	 * Tells if the extension is currently enablde based on user configuration.
-	 */
-	static isEnabled() {
-		return localStorage[ENABLED_ID] === "true";
-	}
-	
+
 	/**
 	 * Either does a new selection, changes the selection or reacts un unselection.
 	 * Restores the original state before the last selection update and applies
 	 * the new highlights according to the new selection.
 	 */
 	static updateSelection(e) {
-		if(!MarkMyWords.isEnabled())
-			return;
-		var selection = window.getSelection(); 
-		var text = selection.toString();
-		if (text === "" || text === this._lastText || text.match(/\s+/g))
-			return;
-		MarkMyWords._lastText = text;
-		MarkMyWords.clearHighlights();
-		var range = selection.getRangeAt(0);
-		selection.removeAllRanges(); // clear
-		MarkMyWords.doHighlight(text);
-		selection.addRange(range);
+		chrome.storage.local.get(ENABLED_ID, function (v){
+			var value = v[ENABLED_ID];
+			if (value !== undefined && !value)
+				return; // we are disabled
+			var selection = window.getSelection(); 
+			var text = selection.toString();
+			if (text === "" || text === this._lastText || text.match(/\s+/g))
+				return;
+			MarkMyWords._lastText = text;
+			MarkMyWords.clearHighlights();
+			var range = selection.getRangeAt(0);
+			selection.removeAllRanges(); // clear
+			MarkMyWords.doHighlight(text);
+			selection.addRange(range);
+		});
 	}
-	
+
 	/**
 	 * Determines what to highlight and invokes the node changes.
 	 */
@@ -100,7 +96,7 @@ class MarkMyWords {
 			result.push(val.substring(index));
 		return { raw: val, out: result };
 	}
-	
+
 	/**
 	 * Alters a text node by replacing it by a series of nodes
 	 * specified by splits. Each null in splits becomes a mark subnode,
@@ -116,12 +112,12 @@ class MarkMyWords {
 		MarkMyWords._highlights[master] = node;
 		for(var item of splits) {
 			var entity = item == null ? 
-				MarkMyWords.makeMarkNode(selection, dom) : 
-				dom.createTextNode(item)
-			master.appendChild(entity);
+					MarkMyWords.makeMarkNode(selection, dom) : 
+						dom.createTextNode(item)
+						master.appendChild(entity);
 		}
 	}
-	
+
 	/**
 	 * Creates an highlight node with given text.
 	 */
@@ -133,7 +129,7 @@ class MarkMyWords {
 		markNode.appendChild(markText);
 		return markNode;
 	}
-	
+
 	// there is no slice on non array-type returned by getElementsByTagName
 	static getShallowElementsCopy(node) {
 		var elements = node.getElementsByTagName("*");
@@ -146,6 +142,12 @@ class MarkMyWords {
 MarkMyWords._highlights = [];
 MarkMyWords._lastText = "";
 
+// set default value if was never set before (is there a setup routine for a chrome extension?)
+chrome.storage.local.get(ENABLED_ID, function (v){
+	var value = v[ENABLED_ID];
+	if (value === undefined)
+		chrome.storage.local.set({[ENABLED_ID]: true});
+});
 
 //global init
 if(typeof document !== 'undefined') { // not defined in test env
@@ -156,13 +158,13 @@ if(typeof document !== 'undefined') { // not defined in test env
 	}
 }
 
-// selection detector init
+//selection detector init
 function afterDOMLoaded() {
 	document.addEventListener("mouseup", MarkMyWords.updateSelection);
 	document.addEventListener("dblclick", MarkMyWords.updateSelection);
 }
 
-// render this class requireable
+//render this class requireable
 if(typeof module !== 'undefined') {
 	module.exports = MarkMyWords;
 }
