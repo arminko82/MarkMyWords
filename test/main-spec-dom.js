@@ -263,28 +263,48 @@ describe('DetectEmailsInStrings', function () {
 	});
 });
 
-describe('TestMainEntryPoint', function () {
+describe('TestMainEntryPointSimple', function () {
 	it('invoke the main function of mmw successfully on a simple test case', function() {
 		var foo = "Hello ";
 		var bar = "world";
 		var input = "<p>" + foo + bar + "</p>";
 		var output = "<p>Hello <mark>world</mark></p>";
 
+		var selection = window.getSelection();
 		// register node and do selection programmatically
 		root.innerHTML = input;
-		var textNode = root.firstChild.firstChild; // text node
+		var textNode = root.firstChild.firstChild;
 		var range = document.createRange();
 		range.setStart(textNode, foo.length);
 		range.setEnd(textNode, foo.length + bar.length);
-		var selection = window.getSelection();
 		selection.removeAllRanges();
 		selection.addRange(range);
 
 		mmw.updateSelection(null);
-		
 		var expected = output;
 		var actual = root.innerHTML;
+		expect(expected).to.equal(actual);
+	});
+});
+
+describe('TestMainEntryPointAdvanced', function () {
+	it('invoke the main function of mmw successfully on a more difficult test case', function() {
+		var bar = "world";
+		var input = "<p>" + bar + " Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod world world tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite=\"http://dummy.com/foo.bar\">erat world</blockquote>, sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita world kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b>world amet</b>.</p>";
+		var output ="<p><mark>" + bar + "</mark> Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod <mark>world</mark> <mark>world</mark> tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite=\"http://dummy.com/foo.bar\">erat <mark>world</mark></blockquote>, sed diam voluptua. At <mark>world</mark> vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita <mark>world</mark> kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b><mark>world</mark> amet</b>.</p>";
 		
+		var selection = window.getSelection();
+		root.innerHTML = input;
+	    var textNode = root.firstChild.firstChild;
+		var range = document.createRange();
+		range.setStart(textNode, 0);
+		range.setEnd(textNode, bar.length);
+		selection.removeAllRanges();
+		selection.addRange(range);
+		
+		mmw.updateSelection(null);
+		var expected = output;
+		var actual = root.innerHTML;
 		expect(expected).to.equal(actual);
 	});
 });
