@@ -123,10 +123,9 @@ static changeNode(node, selection, splits, dom) {
 	master.removeChild(node);
 	MarkMyWords._highlights[master] = node;
 	for(var item of splits) {
-		var entity = item == null ? 
-				MarkMyWords.makeMarkNode(selection, dom) : 
-					dom.createTextNode(item)
-					master.appendChild(entity);
+		master.appendChild(item === null ?
+			MarkMyWords.makeMarkNode(selection, dom) : 
+			dom.createTextNode(item));
 	}
 }
 
