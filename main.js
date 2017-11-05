@@ -66,13 +66,13 @@ class MarkMyWords {
 	static doHighlight(selection) {
 		for (var item of MarkMyWords.getShallowElementsCopy(document.body)) {
 			var child = item.firstChild;
-			if(child === null)
+			if(child === null || child.nodeValue === null || typeof child.nodeValue !== 'string')
 				continue; // empty tag
 			var splits = MarkMyWords.splitOriginal(child.nodeValue, selection);
-			if(splits === null)
-				continue;
-			this._highlights.push({ parent: item, original: splits.raw});
-			MarkMyWords.changeNode(child, selection, splits.out);
+			if(splits !== null) {
+				MarkMyWords._highlights.push({ parent: item, original: splits.raw});
+				MarkMyWords.changeNode(child, selection, splits.out);
+			}
 		}
 	}
 	
@@ -82,18 +82,16 @@ class MarkMyWords {
 	 * entry being null is place for marked text afterwards.
 	 */
 	static splitOriginal(val, selection) {
-		if (val == null || typeof val !== 'string')
-			return null;
 		var indices = [];
 		var i = -1;
 		while((i = val.indexOf(selection, i + 1) ) >= 0)
 			indices.push(i);
-		if(indices.length == 0)
+		if(indices.length === 0)
 			return null;
 		var result = [];
 		var index = 0;
 		var i = 0;
-		if(indices[0] == 0) {
+		if(indices[0] === 0) {
 			result.push(null); // val began with selection
 			index = selection.length;
 			i = 1;
