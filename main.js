@@ -37,7 +37,8 @@ class MarkMyWords {
 				return; // we are disabled
 			var selection = window.getSelection(); 
 			var text = selection.toString();
-			if (text === "" || text === this._lastText || text.match(/\s+/g))
+			if (text === "" || text === this._lastText || text.match(/\s+/g) || 
+					MarkMyWords.isUrl(text) || MarkMyWords.isEmail(text))
 				return;
 			MarkMyWords._lastText = text;
 			MarkMyWords.clearHighlights();
@@ -138,16 +139,36 @@ class MarkMyWords {
 			array[i] = elements[i];
 		return array;
 	}
+
+	/**
+	 *  Returns boolean true if the given text seems to be an url.
+	 */
+	static isUrl(text) {
+		const pattern = /^((http(s)?|ftp)?:\/\/)?([a-z0-9]+(:[a-z0-9]+)?@)?((www\.)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?|(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(:\d{1,5})?([^\s.]+)?$/gmi;
+		//const pattern = /^((http(s)?|ftp)?:\/\/)?([a-z0-9]+(:[a-z0-9]+)?@)?((www\.)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?|(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(:\d{1,5})?(\/.*)?$/gmi;
+		return pattern.test(text);
+	}
+
+	/**
+	 *  Returns boolean true if the given text seems to be an email address.
+	 *  From http://emailregex.com/
+	 */
+	static isEmail(text) {
+		const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/gim;
+		return pattern.test(text);
+	}
 } // end class MarkMyWords
 MarkMyWords._highlights = [];
 MarkMyWords._lastText = "";
 
-// set default value if was never set before (is there a setup routine for a chrome extension?)
-chrome.storage.local.get(ENABLED_ID, function (v){
-	var value = v[ENABLED_ID];
-	if (value === undefined)
-		chrome.storage.local.set({[ENABLED_ID]: true});
-});
+//set default value if was never set before (is there a setup routine for a chrome extension?)
+if(chrome !== undefined && chrome.storage !== undefined) {
+	chrome.storage.local.get(ENABLED_ID, function (v){
+		var value = v[ENABLED_ID];
+		if (value === undefined)
+			chrome.storage.local.set({[ENABLED_ID]: true});
+	});
+}
 
 //global init
 if(typeof document !== 'undefined') { // not defined in test env

@@ -114,6 +114,154 @@ describe('MarkUpSingleNodeText', function() {
 	});
 });
 
+describe('DetectUrlsInStrings', function () {
+	it('should decide if a string is an url', function() {
+		// test cases from https://mathiasbynens.be/demo/url-regex omiting unlikely urls
+		var good = [
+			"http://foo.com/blah_blah",
+			"http://foo.com/blah_blah/",
+			"http://foo.com/blah_blah_(wikipedia)",
+			"http://foo.com/blah_blah_(wikipedia)_(again)",
+			"http://www.example.com/wpstyle/?p=364",
+			"https://www.example.com/foo/?bar=baz&inga=42&quux",
+			"http://userid@example.com",
+			"http://userid@example.com/",
+			"http://userid@example.com:8080",
+			"http://userid@example.com:8080/",
+			"http://userid:password@example.com",
+			"http://userid:password@example.com/",
+			"ftp://foo.bar/baz",
+			"http://142.42.1.1/",
+			"http://142.42.1.1:8080/",
+			"http://foo.com/blah_(wikipedia)#cite-1",
+			"http://foo.com/blah_(wikipedia)_blah#cite-1",
+			"http://foo.com/unicode_(✪)_in_parens",
+			"http://foo.com/(something)?after=parens",
+			"http://code.google.com/events/#&product=browser",
+			"http://j.mp",
+			"http://foo.bar/?q=Test%20URL-encoded%20stuff",
+			"http://1337.net",
+			"http://a.b-c.de",
+			"http://223.255.255.254",
+			"foo.com"
+		];
+		var bad = [
+			"http://",
+			"http://.",
+			"http://..",
+			"http://../",
+			"http://?",
+			"http://??",
+			"http://??/",
+			"http://foo.bar?q=Only the only is deemed part of the url",
+			"http://#",
+			"http://##",
+			"http://##/",
+			"//",
+			"//a",
+			"///a",
+			"///",
+			"http:///a",
+			"rdar://1234",
+			"h://test",
+			"http:// shouldfail.com",
+			":// should fail",
+			"http://foo.bar/foo(bar)baz quux",
+			"ftps://foo.bar/",
+			"http://-error-.invalid/",
+			"http://a.b--c.de/",
+			"http://-a.b.co",
+			"http://a.b-.co",
+//			"http://1.1.1.1.1",
+			"http://123.123.123",
+			"http://3628126748",
+			"http://.www.foo.bar/",
+			"http://www.foo.bar./",
+			"http://.www.foo.bar./"
+		];
+		for(var input of good)
+			expect(mmw.isUrl(input), "URL: " + input).to.be.true;
+		for(var input of bad)
+			expect(mmw.isUrl(input), "URL: " + input).to.be.false;
+	});
+});
+
+describe('DetectEmailsInStrings', function () {
+	it('should decide if a string is an url', function() {
+		// source anonfile
+		var good = [
+			"wita-strelka@freemail.ru",
+			"ramedde2001@yahoo.com",
+			"romassinkovski@yahoo.com",
+			"patrickfigaji@yahoo.com",
+			"saleh.rahimy@yahoo.com",
+			"misa_cojocari@yahoo.com",
+			"zazagejadze@yahoo.com",
+			"marijamarinkovic25@yahoo.com",
+			"ukrajinsky@yahoo.com",
+			"finn_hudson11@yahoo.com",
+			"buyer19722004@yahoo.com",
+			"evanromadhoni16@yahoo.com",
+			"diablo_93_cr@yahoo.com",
+			"cecelbusiness@yahoo.com",
+			"meto4jesus@yahoo.com",
+			"taiwosworld4real@yahoo.com",
+			"yemisi_ife@yahoo.com",
+			"ahmadnawab15@yahoo.com",
+			"danskspiller@yahoo.com",
+			"temirma@yahoo.com",
+			"lenovodell133@yahoo.com",
+			"diana_d70000@yahoo.com",
+			"o.nguyennguyen@yahoo.com",
+			"anya_fedor@yahoo.com",
+			"osborne_pinto@yahoo.com",
+			"danimani_m34@yahoo.com",
+			"skripkin@bmail.ru",
+			"guitar_monic08@yahoo.com",
+			"rinat_tver@yahoo.com",
+			"asha_enterprises91@yahoo.com",
+			"angel9198@gmail.com",
+			"kushnatash@hotmail.com",
+			"gravelinej@hotmail.com",
+			"amelina.sveta2010@gmail.com",
+			"lshaybova@hotmail.com",
+			"aiona_jean@hotmail.com",
+			"rezwan_butt@aol.com",
+			"silkroad_kurdu_81_91a@aol.com",
+			"haryoyo.piet@gmail.com",
+			"kikivariki@aol.com",
+			"sichov_96@gmail.com",
+			"chaffron@gmail.com",
+			"eslam_tarek64@yahoo.com",
+			"ftigergs@yahoo.com",
+			"bnorineru08@gmail.com",
+			"bk.a.l.i.n@orange.fr",
+			"credono@gmail.com",
+			"deddiez07@aol.com",
+			"dkellie.reed@hotmail.com",
+			"bpinkas-s@yahoo.com",
+			"a.ya.vladimir@yahoo.com",
+			"jeromeazilis@yahoo.com",
+			"caribou1@prodigy.net",
+			"kitokatasm@gmail.com",
+			"slonsw36@gmail.com",
+			"aamberlopez@netscape.net",
+			"heshamkamalksa@web.de"
+		];
+		var bad = [
+			"bla",
+			"",
+			"11111111111111111111111111111111",
+			"@",
+			"@yahoo.com",
+			"meep@"
+		];
+		for(var input of good)
+			expect(mmw.isEmail(input), "URL: " + input).to.be.true;
+		for(var input of bad)
+			expect(mmw.isEmail(input), "URL: " + input).to.be.false;
+	});
+});
 describe('RestoreUncheckedState', function () {
 	it('change tdd1 to tdd1b on using highlight function', function() {
 		var input = _htmlFiles['tdd1.html'];
