@@ -262,6 +262,33 @@ describe('DetectEmailsInStrings', function () {
 			expect(mmw.isEmail(input), "URL: " + input).to.be.false;
 	});
 });
+
+describe('TestMainEntryPoint', function () {
+	it('invoke the main function of mmw successfully on a simple test case', function() {
+		var foo = "Hello ";
+		var bar = "world";
+		var input = "<p>" + foo + bar + "</p>";
+		var output = "<p>Hello <mark>world</mark></p>";
+
+		// register node and do selection programmatically
+		root.innerHTML = input;
+		var textNode = root.firstChild.firstChild; // text node
+		var range = document.createRange();
+		range.setStart(textNode, foo.length);
+		range.setEnd(textNode, foo.length + bar.length);
+		var selection = window.getSelection();
+		selection.removeAllRanges();
+		selection.addRange(range);
+
+		mmw.updateSelection(null);
+		
+		var expected = output;
+		var actual = root.innerHTML;
+		
+		expect(expected).to.equal(actual);
+	});
+});
+
 describe('RestoreUncheckedState', function () {
 	it('change tdd1 to tdd1b on using highlight function', function() {
 		var input = _htmlFiles['tdd1.html'];
