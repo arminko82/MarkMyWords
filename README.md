@@ -11,3 +11,7 @@ Notes:
 
 In order to create a chrom extension follow orders in https://developer.chrome.com/webstore/publish
 The package to install can be created by executing pack.sh
+
+**Version changes**
+* 0.9	- First published version, basic functions working
+* 0.10	- Excluded urls (http and ftp) as well as email address from being highlighted.  

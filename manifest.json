@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Mark My Words",
-  "version": "0.9",
+  "version": "0.10",
   "description": "Highlights all occurences of the current text selection.",
   "minimum_chrome_version": "23",
   "icons": {
