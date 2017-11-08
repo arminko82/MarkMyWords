@@ -38,31 +38,39 @@ describe('MarkUpCreation', function() {
 
 describe('SplitOriginalStrings', function() {
 	it('should take some string that is the split by a selection word', function() {
-		var selection = "world";
-		var inputs = [ 
-			"Hello world", 
-			"Hello my world", 
-			"Hello my world.", 
-			"Hello world, this is my world", 
-			"world, oh Hello world", 
+		var selection = "wOrld".toLowerCase();
+		var inputs = [
+			"Hello world",
+			"Hello my world",
+			"Hello my world.",
+			"Hello my World.",
+			"Hello world, this is my world",
+			"world, oh Hello world",
 			" my world",
 			"world",
-			"worldworld", 
+			"worldworld",
 			"world world",
+			"world World",
 			"world\tworld",
-			"worldworldworldworld"];
-		var splits = [ 
+			"worldworldworldworld",
+			", sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet"
+		];
+		var splits = [
 			["Hello ", null],
-			["Hello my ", null], 
-			["Hello my ", null, "."], 
-			["Hello ", null, ", this is my ", null], 
-			[null, ", oh Hello ", null], 
-			[" my ", null], 
-			[null], 
+			["Hello my ", null],
+			["Hello my ", null, "."],
+			["Hello my ", null, "."],
+			["Hello ", null, ", this is my ", null],
+			[null, ", oh Hello ", null],
+			[" my ", null],
+			[null],
 			[null, null],
 			[null, " ", null],
+			[null, " ", null],
 			[null, "\t", null],
-			[null, null, null, null]];
+			[null, null, null, null],
+			[", sed diam voluptua. At ", null, " vero eos et accusam et justo duo dolores et ea rebum. Stet" ]
+		];
 		assert(inputs.length === splits.length, "Test data error");
 
 		for(var i = 0; i < inputs.length; i++) {
@@ -81,19 +89,19 @@ describe('SplitOriginalStrings', function() {
 describe('MarkUpSingleNodeText', function() {
 	it('should take a single html node and apply the highlight on it', function() {
 		var highlight = "world";
-		var inputs = [ 
-			"<p>Hello world</p>", 
-			"<p>Hello my world</p>", 
-			"<p>Hello my world. Hello my world.</p>", 
-			"<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod world world tempor invidunt ut labore et dolore magna aliquyam erat world, sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit world amet.</p>", 
+		var inputs = [
+			"<p>Hello world</p>",
+			"<p>Hello my world</p>",
+			"<p>Hello my world. Hello my world.</p>",
+			"<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod world world tempor invidunt ut labore et dolore magna aliquyam erat world, sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit world amet.</p>",
 			"<p></p><!-- is the child of this p null? -->"];
-		var outputs = [ 
-			"<p>Hello <mark>world</mark></p>", 
+		var outputs = [
+			"<p>Hello <mark>world</mark></p>",
 			"<p>Hello my <mark>world</mark></p>",
 			"<p>Hello my <mark>world</mark>. Hello my <mark>world</mark>.</p>",
 			"<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod <mark>world</mark> <mark>world</mark> tempor invidunt ut labore et dolore magna aliquyam erat <mark>world</mark>, sed diam voluptua. At <mark>world</mark> vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <mark>world</mark> amet.</p>",
 			"<p></p>"];
-		var splits = [ 
+		var splits = [
 			["Hello ", null],
 			["Hello my ", null],
 			["Hello my ", null, ". Hello my ", null, "."],
@@ -114,6 +122,39 @@ describe('MarkUpSingleNodeText', function() {
 	});
 });
 
+describe('MarkUpNestedNodes', function() {
+	it('should take a multiple html nodes and apply the highlight on all of them', function() {
+		var highlight = "world";
+		var inputs = [
+			"<p>Hello <b>" + highlight+ "</b>.</p>",
+			"<p>Hello <b>" + highlight+ "</b></p>",
+			'<p>' + highlight + ' Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod world world tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite="http://dummy.com/foo.bar"><p>erat world</p></blockquote>, sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita world kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b>world amet</b>.</p>',
+			];
+		var outputs = [
+			"<p>Hello <b><mark>" + highlight+ "</mark></b>.</p>",
+			"<p>Hello <b><mark>" + highlight+ "</mark></b></p>",
+			'<p><mark>' + highlight + '</mark> Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod <mark>world</mark> <mark>world</mark> tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite="http://dummy.com/foo.bar"><p>erat <mark>world</mark></p></blockquote>, sed diam voluptua. At <mark>world</mark> vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita <mark>world</mark> kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b><mark>world</mark> amet</b>.</p>',
+		];
+		var splits = [
+			["Hello ", null],
+			["Hello my ", null],
+			["Hello my ", null, ". Hello my ", null, "."],
+			["Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod ", null, " ", null, " tempor invidunt ut labore et dolore magna aliquyam erat ", null, ", sed diam voluptua. At ", null, " vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit ", null, " amet."],
+			null];
+		assert(inputs.length === outputs.length, "Test data error");
+		assert(inputs.length === splits.length, "Test data error");
+
+		for(var i = 0; i < inputs.length; i++) {
+			root.innerHTML = inputs[i];
+			var expected = outputs[i];
+			var p = root.firstChild;
+			var node = p.firstChild;
+			mmw.changeNode(node, highlight, splits[i]);
+			var actual = p.outerHTML;
+			expect(expected).to.equal(actual);
+		}
+	});
+});
 describe('DetectUrlsInStrings', function () {
 	it('should decide if a string is an url', function() {
 		// test cases from https://mathiasbynens.be/demo/url-regex omiting unlikely urls
@@ -290,9 +331,9 @@ describe('TestMainEntryPointSimple', function () {
 describe('TestMainEntryPointAdvanced', function () {
 	it('invoke the main function of mmw successfully on a more difficult test case', function() {
 		var bar = "world";
-		var input = "<p>" + bar + " Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod world world tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite=\"http://dummy.com/foo.bar\">erat world</blockquote>, sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita world kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b>world amet</b>.</p>";
-		var output ="<p><mark>" + bar + "</mark> Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod <mark>world</mark> <mark>world</mark> tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite=\"http://dummy.com/foo.bar\">erat <mark>world</mark></blockquote>, sed diam voluptua. At <mark>world</mark> vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita <mark>world</mark> kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b><mark>world</mark> amet</b>.</p>";
-		
+		var input = '<p>' + bar + ' Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod world world tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite="http://dummy.com/foo.bar"><p>erat world</p></blockquote>, sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita world kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b>world amet</b>.</p>';
+		var output ='<p><mark>' + bar + '</mark> Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod <mark>world</mark> <mark>world</mark> tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite="http://dummy.com/foo.bar"><p>erat <mark>world</mark></p></blockquote>, sed diam voluptua. At <mark>world</mark> vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita <mark>world</mark> kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b><mark>world</mark> amet</b>.</p>';
+
 		var selection = window.getSelection();
 		root.innerHTML = input;
 	    var textNode = root.firstChild.firstChild;
@@ -301,7 +342,7 @@ describe('TestMainEntryPointAdvanced', function () {
 		range.setEnd(textNode, bar.length);
 		selection.removeAllRanges();
 		selection.addRange(range);
-		
+
 		mmw.updateSelection(null);
 		var expected = output;
 		var actual = root.innerHTML;

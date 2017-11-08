@@ -23,22 +23,22 @@ class MarkMyWords {
 			MarkMyWords.doUpdateSelection(e);
 		}
 	}
-	
+
 	/**
 	 * Performs the job of updateSelection if either a chrome local store is found
 	 * and the settings could be read or if no store is present (dev mode).
 	 */
 	static doUpdateSelection (e) {
-		var selection = window.getSelection(); 
+		var selection = window.getSelection();
 		var text = selection.toString();
-		if (text === "" || text === this._lastText || text.match(/\s+/g) || 
+		if (text === "" || text === this._lastText || text.match(/\s+/g) ||
 				MarkMyWords.isUrl(text) || MarkMyWords.isEmail(text))
 			return;
 		MarkMyWords._lastText = text;
 		MarkMyWords.clearHighlights();
 		var range = selection.getRangeAt(0);
 		selection.removeAllRanges(); // clear
-		MarkMyWords.doHighlight(text);
+		MarkMyWords.doHighlight(text.toLowerCase());
 		selection.addRange(range);
 	}
 
@@ -59,7 +59,7 @@ class MarkMyWords {
 		}
 		MarkMyWords._highlights = [];
 	}
-	
+
 	/**
 	 * Determines what to highlight and invokes the node changes.
 	 */
@@ -75,16 +75,17 @@ class MarkMyWords {
 			}
 		}
 	}
-	
+
 	/**
 	 * If input is a string (among html nodes) split it by selection.
-	 * @return: null on nothing, array of substring, the place of each 
+	 * @return: null on nothing, array of substring, the place of each
 	 * entry being null is place for marked text afterwards.
 	 */
 	static splitOriginal(val, selection) {
 		var indices = [];
 		var i = -1;
-		while((i = val.indexOf(selection, i + 1) ) >= 0)
+		var test = val.toLowerCase();
+		while((i = test.indexOf(selection, i + 1) ) >= 0)
 			indices.push(i);
 		if(indices.length === 0)
 			return null;
@@ -106,7 +107,7 @@ class MarkMyWords {
 			result.push(val.substring(index));
 		return { raw: val, out: result };
 	}
-	
+
 	/**
 	 * Alters a text node by replacing it by a series of nodes
 	 * specified by splits. Each null in splits becomes a mark subnode,
@@ -122,11 +123,11 @@ class MarkMyWords {
 		MarkMyWords._highlights[master] = node;
 		for(var item of splits) {
 			master.appendChild(item === null ?
-				MarkMyWords.makeMarkNode(selection, dom) : 
+				MarkMyWords.makeMarkNode(selection, dom) :
 				dom.createTextNode(item));
 		}
 	}
-	
+
 	/**
 	 * Creates an highlight node with given text.
 	 */
@@ -138,7 +139,7 @@ class MarkMyWords {
 		markNode.appendChild(markText);
 		return markNode;
 	}
-	
+
 	// there is no slice on non array-type returned by getElementsByTagName
 	static getShallowElementsCopy(node) {
 		var elements = node.getElementsByTagName("*");
@@ -147,7 +148,7 @@ class MarkMyWords {
 			array[i] = elements[i];
 		return array;
 	}
-	
+
 	/**
 	 *  Returns boolean true if the given text seems to be an url.
 	 */
@@ -155,7 +156,7 @@ class MarkMyWords {
 		const pattern = /^((http(s)?|ftp)?:\/\/)?([a-z0-9]+(:[a-z0-9]+)?@)?((www\.)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?|(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(:\d{1,5})?([^\s.]+)?$/gmi;
 		return pattern.test(text);
 	}
-	
+
 	/**
 	 *  Returns boolean true if the given text seems to be an email address.
 	 *  From http://emailregex.com/
