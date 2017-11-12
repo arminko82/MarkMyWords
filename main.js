@@ -30,7 +30,7 @@ class MarkMyWords {
 	 */
 	static doUpdateSelection (e) {
 		var selection = window.getSelection();
-		var text = selection.toString();
+		var text = selection.toString().trim();
 		if (text === "" || text === this._lastText || text.match(/\s+/g) ||
 				MarkMyWords.isUrl(text) || MarkMyWords.isEmail(text))
 			return;

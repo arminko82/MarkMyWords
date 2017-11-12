@@ -38,7 +38,10 @@ describe('MarkUpCreation', function() {
 
 describe('SplitOriginalStrings', function() {
 	it('should take some string that is the split by a selection word', function() {
-		var selection = "wOrld".toLowerCase();
+		var selection = [
+			"wOrld".toLowerCase(),
+			" world\t ".trim(),
+		];
 		var inputs = [
 			"Hello world",
 			"Hello my world",
@@ -72,6 +75,43 @@ describe('SplitOriginalStrings', function() {
 			[", sed diam voluptua. At ", null, " vero eos et accusam et justo duo dolores et ea rebum. Stet" ]
 		];
 		assert(inputs.length === splits.length, "Test data error");
+		for (var j = 0; j < selection.length; j++) {
+			var term = selection[j];
+			for(var i = 0; i < inputs.length; i++) {
+				var input = inputs[i];
+				var expected = splits[i];
+				var actual = mmw.splitOriginal(input, term);
+				expect(input).to.equal(actual.raw);
+				expect(expected).to.deep.equal(actual.out);
+			}
+		}
+		expect(mmw.splitOriginal("keinewelt", selection[0])).to.be.null;
+		expect(mmw.splitOriginal("", selection[0])).to.be.null;
+	});
+});
+
+describe('SplitBySelectionsIncludingWhitespaces', function() {
+	it('should be able to split any text where the sperator contains whitespaces', function() {
+		var selection = "a b c".toLowerCase();
+		var inputs = [
+			"a b c",
+			"a b ca b c",
+			"a b c a b c",
+			"a",
+			"aberaber",
+			"0 a b c 1",
+			"b c bmx fix bam foo bar \t meep a b c lululu",
+		];
+		var splits = [
+			[null],
+			[null, null],
+			[null, " ", null],
+			["a"],
+			["aberaber"],
+			["0 ", null, " 1"],
+			["b c bmx fix bam foo bar \t meep ", null, " lululu"],
+		];
+		assert(inputs.length === splits.length, "Test data error");
 
 		for(var i = 0; i < inputs.length; i++) {
 			var input = inputs[i];
@@ -80,11 +120,8 @@ describe('SplitOriginalStrings', function() {
 			expect(input).to.equal(actual.raw);
 			expect(expected).to.deep.equal(actual.out);
 		}
-		expect(mmw.splitOriginal("keinewelt", selection)).to.be.null;
-		expect(mmw.splitOriginal("", selection)).to.be.null;
 	});
 });
-
 
 describe('MarkUpSingleNodeText', function() {
 	it('should take a single html node and apply the highlight on it', function() {
