@@ -11,16 +11,16 @@ class MarkMyWords {
 	 * Restores the original state before the last selection update and applies
 	 * the new highlights according to the new selection.
 	 */
-	static updateSelection(e) {
+	static updateSelection(e,root = document.body) {
 		if(chrome !== undefined && chrome.storage !== undefined) {
 			chrome.storage.local.get(ENABLED_ID, function(v) {
 				var value = v[ENABLED_ID];
 				if (value !== undefined && !value)
 					return; // we are deliberatly disabled by options
-				MarkMyWords.doUpdateSelection(e);
+				MarkMyWords.doUpdateSelection(e, root);
 			});
 		} else {
-			MarkMyWords.doUpdateSelection(e);
+			MarkMyWords.doUpdateSelection(e, root);
 		}
 	}
 
@@ -28,7 +28,7 @@ class MarkMyWords {
 	 * Performs the job of updateSelection if either a chrome local store is found
 	 * and the settings could be read or if no store is present (dev mode).
 	 */
-	static doUpdateSelection (e) {
+	static doUpdateSelection (e, root) {
 		var selection = window.getSelection();
 		var text = selection.toString().trim();
 		if (text === "" || text === this._lastText || text.match(/\s+/g) ||
@@ -38,7 +38,7 @@ class MarkMyWords {
 		MarkMyWords.clearHighlights();
 		var range = selection.getRangeAt(0);
 		selection.removeAllRanges(); // clear
-		MarkMyWords.doHighlight(text.toLowerCase());
+		MarkMyWords.doHighlight(text.toLowerCase(), root);
 		selection.addRange(range);
 	}
 
@@ -63,22 +63,23 @@ class MarkMyWords {
 	/**
 	 * Determines what to highlight and invokes the node changes.
 	 */
-	static doHighlight(selection) {
-		for (var item of MarkMyWords.getShallowElementsCopy(document.body)) {
-			var child = item.firstChild;
-			if(child === null || child.nodeValue === null || typeof child.nodeValue !== 'string')
-				continue; // empty tag
-			var splits = MarkMyWords.splitOriginal(child.nodeValue, selection);
-			if(splits !== null) {
-				MarkMyWords._highlights.push({ parent: item, original: splits.raw});
-				MarkMyWords.changeNode(child, selection, splits.out);
-			}
+	static doHighlight(selection, root) {
+		var textNodes = MarkMyWords.getAllTextNodes(root);
+		for (var child of textNodes) {
+			var item = child.parentNode;
+			var text = child.nodeValue;
+			if(text.match(/<\/?\w+>/g))
+				throw "HTML elements in text not allowed!";
+			var splits = MarkMyWords.splitOriginal(text, selection);
+			MarkMyWords._highlights.push({ parent: item, original: splits.raw});
+			MarkMyWords.changeNode(child, selection, splits.out);
 		}
 	}
 
 	/**
 	 * If input is a string (among html nodes) split it by selection.
-	 * @return: null on nothing, array of substring, the place of each
+	 * @return: null on nothing, array of length 1 with original string
+	 * on not finding selection, array of substring, the place of each
 	 * entry being null is place for marked text afterwards.
 	 */
 	static splitOriginal(val, selection) {
@@ -88,7 +89,7 @@ class MarkMyWords {
 		while((i = test.indexOf(selection, i + 1) ) >= 0)
 			indices.push(i);
 		if(indices.length === 0)
-			return null;
+			return { raw: val, out: [val] };
 		var result = [];
 		var index = 0;
 		var i = 0;
@@ -119,7 +120,7 @@ class MarkMyWords {
 		if(dom == null)
 			dom = document;
 		var master = node.parentNode;
-		master.removeChild(node);
+		master.removeChild(node); ich denke hier werden mehrere kinder möglch sein, deshalb reversing
 		MarkMyWords._highlights[master] = node;
 		for(var item of splits) {
 			master.appendChild(item === null ?
@@ -141,12 +142,25 @@ class MarkMyWords {
 	}
 
 	// there is no slice on non array-type returned by getElementsByTagName
-	static getShallowElementsCopy(node) {
-		var elements = node.getElementsByTagName("*");
-		var array = new Array(elements.length);
-		for(var i = 0; i < elements.length;i++)
-			array[i] = elements[i];
-		return array;
+	static getAllTextNodes(node) {
+		const ELEM_NODE = 1;
+		const TEXT_NODE = 3;
+		var result = [];
+
+		function searcher(node, result) {
+			for(var child of node.childNodes) {
+				switch(child.nodeType) {
+					case ELEM_NODE:
+						searcher(child, result);
+						break;
+					case TEXT_NODE:
+						result.push(child);
+						break;
+				}
+			}
+		}
+		searcher(node, result);
+		return result;
 	}
 
 	/**

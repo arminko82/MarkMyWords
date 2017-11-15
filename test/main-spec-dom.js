@@ -15,15 +15,14 @@ describe('MarkMyWords', function() {
 	});
 });
 
-describe('ShallowDomElementsCopy', function() {
-	it('should create a shallow copy of all DOM nodes below my-root node in given document\'s body', function() {
-		var input = ["<p>Hello world</p>", "<p>Hello my world</p>", "<p></p>"];
+describe('GetAllTextNodesFromDOM', function() {
+	it('should create a shallow copy of all DOM text nodes below my-root node in given document\'s body', function() {
+		var input = ["<p>Hello world</p>", "<p>Hello my world</p>", "meeep"];
 		root.innerHTML = input.join("");
-		var expected = input;
-		var actual = mmw.getShallowElementsCopy(root);
-		var actualStrings = actual.map(x => x.outerHTML);
+		var expected = ["Hello world","Hello my world","meeep"];
+		var actual = mmw.getAllTextNodes(root).map(n => n.nodeValue);
 		expect(actual).to.have.lengthOf(input.length);
-		expect(actualStrings).to.deep.equal(expected);
+		expect(actual).to.deep.equal(expected);
 	});
 });
 
@@ -43,6 +42,8 @@ describe('SplitOriginalStrings', function() {
 			" world\t ".trim(),
 		];
 		var inputs = [
+			"",
+			"keinewelt",
 			"Hello world",
 			"Hello my world",
 			"Hello my world.",
@@ -59,6 +60,8 @@ describe('SplitOriginalStrings', function() {
 			", sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet"
 		];
 		var splits = [
+			[""],
+			["keinewelt"],
 			["Hello ", null],
 			["Hello my ", null],
 			["Hello my ", null, "."],
@@ -85,8 +88,6 @@ describe('SplitOriginalStrings', function() {
 				expect(expected).to.deep.equal(actual.out);
 			}
 		}
-		expect(mmw.splitOriginal("keinewelt", selection[0])).to.be.null;
-		expect(mmw.splitOriginal("", selection[0])).to.be.null;
 	});
 });
 
@@ -159,39 +160,6 @@ describe('MarkUpSingleNodeText', function() {
 	});
 });
 
-describe('MarkUpNestedNodes', function() {
-	it('should take a multiple html nodes and apply the highlight on all of them', function() {
-		var highlight = "world";
-		var inputs = [
-			"<p>Hello <b>" + highlight+ "</b>.</p>",
-			"<p>Hello <b>" + highlight+ "</b></p>",
-			'<p>' + highlight + ' Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod world world tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite="http://dummy.com/foo.bar"><p>erat world</p></blockquote>, sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita world kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b>world amet</b>.</p>',
-			];
-		var outputs = [
-			"<p>Hello <b><mark>" + highlight+ "</mark></b>.</p>",
-			"<p>Hello <b><mark>" + highlight+ "</mark></b></p>",
-			'<p><mark>' + highlight + '</mark> Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod <mark>world</mark> <mark>world</mark> tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite="http://dummy.com/foo.bar"><p>erat <mark>world</mark></p></blockquote>, sed diam voluptua. At <mark>world</mark> vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita <mark>world</mark> kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b><mark>world</mark> amet</b>.</p>',
-		];
-		var splits = [
-			["Hello ", null],
-			["Hello my ", null],
-			["Hello my ", null, ". Hello my ", null, "."],
-			["Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod ", null, " ", null, " tempor invidunt ut labore et dolore magna aliquyam erat ", null, ", sed diam voluptua. At ", null, " vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit ", null, " amet."],
-			null];
-		assert(inputs.length === outputs.length, "Test data error");
-		assert(inputs.length === splits.length, "Test data error");
-
-		for(var i = 0; i < inputs.length; i++) {
-			root.innerHTML = inputs[i];
-			var expected = outputs[i];
-			var p = root.firstChild;
-			var node = p.firstChild;
-			mmw.changeNode(node, highlight, splits[i]);
-			var actual = p.outerHTML;
-			expect(expected).to.equal(actual);
-		}
-	});
-});
 describe('DetectUrlsInStrings', function () {
 	it('should decide if a string is an url', function() {
 		// test cases from https://mathiasbynens.be/demo/url-regex omiting unlikely urls
@@ -358,29 +326,53 @@ describe('TestMainEntryPointSimple', function () {
 		selection.removeAllRanges();
 		selection.addRange(range);
 
-		mmw.updateSelection(null);
+		mmw.updateSelection(null, root);
 		var expected = output;
 		var actual = root.innerHTML;
 		expect(expected).to.equal(actual);
 	});
 });
 
-describe('TestMainEntryPointAdvanced', function () {
+describe('TestMainEntryPointAdvancedShort', function () {
 	it('invoke the main function of mmw successfully on a more difficult test case', function() {
 		var bar = "world";
-		var input = '<p>' + bar + ' Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod world world tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite="http://dummy.com/foo.bar"><p>erat world</p></blockquote>, sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita world kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b>world amet</b>.</p>';
-		var output ='<p><mark>' + bar + '</mark> Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod <mark>world</mark> <mark>world</mark> tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote cite="http://dummy.com/foo.bar"><p>erat <mark>world</mark></p></blockquote>, sed diam voluptua. At <mark>world</mark> vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita <mark>world</mark> kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b><mark>world</mark> amet</b>.</p>';
+		var input = '<p>' + bar + ' Start.</p> This ' + bar +' is not found.<p>End</p>';
+		var output ='<p><mark>' + bar + '</mark> Start.</p> This <mark>' + bar +'</mark> is not found.<p>End</p>';
 
 		var selection = window.getSelection();
+		selection.removeAllRanges();
 		root.innerHTML = input;
-	    var textNode = root.firstChild.firstChild;
+		selection.removeAllRanges();
+		var textNode = root.firstChild.firstChild;
 		var range = document.createRange();
 		range.setStart(textNode, 0);
 		range.setEnd(textNode, bar.length);
-		selection.removeAllRanges();
 		selection.addRange(range);
 
-		mmw.updateSelection(null);
+		mmw.updateSelection(null, root);
+		var expected = output;
+		var actual = root.innerHTML;
+		expect(expected).to.equal(actual);
+	});
+
+});describe('TestMainEntryPointAdvancedLong', function () {
+	it('invoke the main function of mmw successfully on a more difficult test case', function() {
+		var bar = "world";
+		var input = '<p>' + bar + ' Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod world world tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote><p>erat world</p></blockquote>, sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita world kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b>world amet</b>.</p>';
+		var output ='<p><mark>' + bar + '</mark> Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod <mark>world</mark> <mark>world</mark> tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote><p>erat <mark>world</mark></p></blockquote>, sed diam voluptua. At <mark>world</mark> vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita <mark>world</mark> kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b><mark>world</mark> amet</b>.</p>';
+
+
+		var selection = window.getSelection();
+		selection.removeAllRanges();
+		root.innerHTML = input;
+		selection.removeAllRanges();
+		var textNode = root.firstChild.firstChild;
+		var range = document.createRange();
+		range.setStart(textNode, 0);
+		range.setEnd(textNode, bar.length);
+		selection.addRange(range);
+
+		mmw.updateSelection(null, root);
 		var expected = output;
 		var actual = root.innerHTML;
 		expect(expected).to.equal(actual);
