@@ -1,62 +1,51 @@
 "use strict";
+/* eslint-disable no-undef */
 
-var mmw = require('../main.js');
+const isChrome = typeof chrome != "undefined";
+const expect = isChrome ? chai.expect : require("chai").expect;
+const assert = isChrome ? chai.assert : require("chai").assert;
+const mmw = isChrome ? MarkMyWords : require("../main.js");
 
-if(typeof document === "undefined") {	// tdd
-	require('jsdom-global')()
-	const jsdom = require('jsdom');
-	const { JSDOM } = jsdom;
-	var expect = require('chai').expect;
-	var assert = require('chai').assert;
-	var cheerio = require('cheerio');
-	var fs = require('fs');
-} else {									// bdd
-	console.log(location.href);
-} 
+if(!isChrome) {
+	require("jsdom-global")(); // creates js-dom	
+}
 
-
-var _fileNames = ['tdd1.html', 'tdd1b.html'].map(function (f) { return "test/" + f});
+var _fileNames = ["tdd1.html", "tdd1b.html"].map(function (f) { return "test/" + f;});
 var _htmlFiles = {};
 
-describe('MarkMyWords', function() {
-    it('should exist', function() {
-        expect(mmw).to.not.be.undefined;
-    });
-});
-
-describe('ReadTestFiles', function () {
-	it('should be able to read and buffer html files for next tests', function() {
-		for (var fileName of _fileNames) {
-			var file = fs.readFileSync(fileName)
-			expect(file.length).to.be.above(0);
-			_htmlFiles[fileName] = file;
-		}
+describe("MarkMyWords should be found and helper should work", function() {
+	it("should exist", function() {
+		expect(mmw).to.not.be.undefined;
 	});
-});
 
-describe('MarkUpCreation', function() {
-    it('should make a highlighted version of a text as HTML fragment', function() {
-        var input = "Foo";
-        var expected = "<mark>" + input + "</mark>";
-        var actual = mmw.makeMarkNode(input).outerHTML;
-        expect(actual).to.equal(expected);
-    });
-});
+	if(isChrome) {
+		it("should be able to read and buffer html files for next tests", function() {
+			for (var fileName of _fileNames) {
+				var file = require("fs").readFileSync(fileName);
+				expect(file.length).to.be.above(0);
+				_htmlFiles[fileName] = file;
+			}
+		});
+	}
 
-describe('ShallowDomElementsCopy', function() {
-    it('should create a shallow copy of all DOM nodes in given document\'s body', function() {
-    		var input = ["<p>Hello world</p>", "<p>Hello my world</p>", "<p></p>"];
-        document.body.innerHTML = input.join(); // document from jsdom-global
-        var expected = input;
-        var actual = mmw.getShallowElementsCopy(document.body);
-        var actualStrings = actual.map(x => x.outerHTML);
-        expect(actual).to.have.lengthOf(input.length);
-        expect(actualStrings).to.deep.equal(expected);
-    });
-});
+	it("should make a highlighted version of a text as HTML fragment", function() {
+		var input = "Foo";
+		var expected = "<mark>" + input + "</mark>";
+		var actual = mmw.makeMarkNode(input).outerHTML;
+		expect(actual).to.equal(expected);
+	});
 
-describe('SplitOriginalStrings', function() {
-    it('should take some string that is the split by a selection word', function() {
+	it("should create a shallow copy of all DOM nodes in given document's body", function() {
+		var input = ["<p>Hello world</p>", "<p>Hello my world</p>", "<p></p>"];
+		document.body.innerHTML = input.join(); // document from jsdom-global
+		var expected = input;
+		var actual = mmw.getShallowElementsCopy(document.body);
+		var actualStrings = actual.map(x => x.outerHTML);
+		expect(actual).to.have.lengthOf(input.length);
+		expect(actualStrings).to.deep.equal(expected);
+	});
+
+	it("should take some string that is the split by a selection word", function() {
 		var selection = "world";
 		var inputs = [ 
 			"Hello world", 
@@ -85,13 +74,13 @@ describe('SplitOriginalStrings', function() {
 		assert(inputs.length === splits.length, "Test data error");
     
 		for(var i = 0; i < inputs.length; i++) {
-			var input = inputs[i];
-	        var expected = splits[i];
-	        var actual = mmw.splitOriginal(input, selection);
-	        	expect(input).to.equal(actual.raw);
-	        	expect(expected).to.deep.equal(actual.out);
+			const input = inputs[i];
+			const expected = splits[i];
+			const actual = mmw.splitOriginal(input, selection);
+			expect(input).to.equal(actual.raw);
+			expect(expected).to.deep.equal(actual.out);
 		}
 		expect(mmw.splitOriginal("keinewelt", selection)).to.be.null;
 		expect(mmw.splitOriginal("", selection)).to.be.null;
-    });
+	});
 });

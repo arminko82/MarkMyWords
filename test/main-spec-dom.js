@@ -1,22 +1,27 @@
 "use strict";
+/* eslint-disable no-undef */
 
-var expect = chai.expect;
-var assert = chai.assert;
-var mmw = MarkMyWords;
+const isChrome = typeof chrome != "undefined";
+const expect = isChrome ? chai.expect : require("chai").expect;
+const assert = isChrome ? chai.assert : require("chai").assert;
+const mmw = isChrome ? MarkMyWords : require("../main.js");
 
-var _fileNames = ['tdd1.html', 'tdd1b.html'].map(function (f) { return "test/" + f});
-var _htmlFiles = {};
+if(!isChrome) {
+	const path = require("path");
+	const fs   = require("fs");
+	const folder = path.dirname(fs.realpathSync(__filename));
+	const fp = path.join(folder, "bdd-mocha-jsdom.html");
+	const html = fs.readFileSync(fp, "utf8");
+	require("jsdom-global")(html); // creates js-dom
+}
+const root =  document.getElementById("my-root");
 
-var root =  document.getElementById("my-root");
-
-describe('MarkMyWords', function() {
-	it('should exist', function() {
+describe("MarkMyWords Basics", function() {
+	it("should exist", function() {
 		expect(mmw).to.not.be.undefined;
 	});
-});
 
-describe('GetAllTextNodesFromDOM', function() {
-	it('should create a shallow copy of all DOM text nodes below my-root node in given document\'s body', function() {
+	it("should create a shallow copy of all DOM text nodes below my-root node in given document's body", function() {
 		var input = ["<p>Hello world</p>", "<p>Hello my world</p>", "meeep"];
 		root.innerHTML = input.join("");
 		var expected = ["Hello world","Hello my world","meeep"];
@@ -24,19 +29,15 @@ describe('GetAllTextNodesFromDOM', function() {
 		expect(actual).to.have.lengthOf(input.length);
 		expect(actual).to.deep.equal(expected);
 	});
-});
 
-describe('MarkUpCreation', function() {
-	it('should make a highlighted version of a text as HTML fragment', function() {
+	it("should make a highlighted version of a text as HTML fragment", function() {
 		var input = "Foo";
 		var expected = "<mark>" + input + "</mark>";
 		var actual = mmw.makeMarkNode(input).outerHTML;
 		expect(actual).to.equal(expected);
 	});
-});
 
-describe('SplitOriginalStrings', function() {
-	it('should take some string that is the split by a selection word', function() {
+	it("should use a string to split a string into an array of strings", function() {
 		var selection = [
 			"wOrld".toLowerCase(),
 			" world\t ".trim(),
@@ -89,10 +90,8 @@ describe('SplitOriginalStrings', function() {
 			}
 		}
 	});
-});
 
-describe('SplitBySelectionsIncludingWhitespaces', function() {
-	it('should be able to split any text where the sperator contains whitespaces', function() {
+	it("should be able to split any text where the sperator contains whitespaces", function() {
 		var selection = "a b c".toLowerCase();
 		var inputs = [
 			"a b c",
@@ -122,10 +121,8 @@ describe('SplitBySelectionsIncludingWhitespaces', function() {
 			expect(expected).to.deep.equal(actual.out);
 		}
 	});
-});
 
-describe('MarkUpSingleNodeText', function() {
-	it('should take a single html node and apply the highlight on it', function() {
+	it("should take a single html node and apply the highlight on it", function() {
 		var highlight = "world";
 		var inputs = [
 			"<p>Hello world</p>",
@@ -158,10 +155,8 @@ describe('MarkUpSingleNodeText', function() {
 			expect(expected).to.equal(actual);
 		}
 	});
-});
 
-describe('DetectUrlsInStrings', function () {
-	it('should decide if a string is an url', function() {
+	it("should be able to decide if a string is an url", function() {
 		// test cases from https://mathiasbynens.be/demo/url-regex omiting unlikely urls
 		var good = [
 			"http://foo.com/blah_blah",
@@ -218,22 +213,20 @@ describe('DetectUrlsInStrings', function () {
 			"http://a.b--c.de/",
 			"http://-a.b.co",
 			"http://a.b-.co",
-//			"http://1.1.1.1.1",
+			//			"http://1.1.1.1.1",
 			"http://123.123.123",
 			"http://3628126748",
 			"http://.www.foo.bar/",
 			"http://www.foo.bar./",
 			"http://.www.foo.bar./"
 		];
-		for(var input of good)
-			expect(mmw.isUrl(input), "URL: " + input).to.be.true;
-		for(var input of bad)
-			expect(mmw.isUrl(input), "URL: " + input).to.be.false;
+		for(var goody of good)
+			expect(mmw.isUrl(goody), "URL: " + goody).to.be.true;
+		for(var baddy of bad)
+			expect(mmw.isUrl(baddy), "URL: " + baddy).to.be.false;
 	});
-});
 
-describe('DetectEmailsInStrings', function () {
-	it('should decide if a string is an url', function() {
+	it("should decide if a string is an email address", function() {
 		// source anonfile
 		var good = [
 			"wita-strelka@freemail.ru",
@@ -302,15 +295,15 @@ describe('DetectEmailsInStrings', function () {
 			"@yahoo.com",
 			"meep@"
 		];
-		for(var input of good)
-			expect(mmw.isEmail(input), "URL: " + input).to.be.true;
-		for(var input of bad)
-			expect(mmw.isEmail(input), "URL: " + input).to.be.false;
+		for(var goody of good)
+			expect(mmw.isEmail(goody), "URL: " + goody).to.be.true;
+		for(var baddy of bad)
+			expect(mmw.isEmail(baddy), "URL: " + baddy).to.be.false;
 	});
 });
 
-describe('TestMainEntryPointSimple', function () {
-	it('invoke the main function of mmw successfully on a simple test case', function() {
+describe("MarkMyWords Advanced", function () {
+	it("invoke the main function of mmw successfully on a simple test case", function() {
 		var foo = "Hello ";
 		var bar = "world";
 		var input = "<p>" + foo + bar + "</p>";
@@ -331,13 +324,11 @@ describe('TestMainEntryPointSimple', function () {
 		var actual = root.innerHTML;
 		expect(expected).to.equal(actual);
 	});
-});
 
-describe('TestMainEntryPointAdvancedShort', function () {
-	it('invoke the main function of mmw successfully on a more difficult test case', function() {
+	it("invoke the main function of mmw successfully on a more difficult test case", function() {
 		var bar = "world";
-		var input = '<p>' + bar + ' Start.</p> This ' + bar +' is not found.<p>End</p>';
-		var output ='<p><mark>' + bar + '</mark> Start.</p> This <mark>' + bar +'</mark> is not found.<p>End</p>';
+		var input = "<p>" + bar + " Start.</p> This " + bar +" is not found.<p>End</p>";
+		var output ="<p><mark>" + bar + "</mark> Start.</p> This <mark>" + bar +"</mark> is not found.<p>End</p>";
 
 		var selection = window.getSelection();
 		selection.removeAllRanges();
@@ -353,36 +344,37 @@ describe('TestMainEntryPointAdvancedShort', function () {
 		var expected = output;
 		var actual = root.innerHTML;
 		expect(expected).to.equal(actual);
-	});
 
-});describe('TestMainEntryPointAdvancedLong', function () {
-	it('invoke the main function of mmw successfully on a more difficult test case', function() {
-		var bar = "world";
-		var input = '<p>' + bar + ' Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod world world tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote><p>erat world</p></blockquote>, sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita world kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b>world amet</b>.</p>';
-		var output ='<p><mark>' + bar + '</mark> Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod <mark>world</mark> <mark>world</mark> tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote><p>erat <mark>world</mark></p></blockquote>, sed diam voluptua. At <mark>world</mark> vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita <mark>world</mark> kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b><mark>world</mark> amet</b>.</p>';
+		it("invoke the main function of mmw successfully on a more difficult test case", function() {
+			var bar = "world";
+			var input = "<p>" + bar + " Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod world world tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote><p>erat world</p></blockquote>, sed diam voluptua. At world vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita world kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b>world amet</b>.</p>";
+			var output ="<p><mark>" + bar + "</mark> Lorem ipsum dolor sit amet, </p><p>consetetur sadipscing elitr, sed diam nonumy eirmod <mark>world</mark> <mark>world</mark> tempor </p>invidunt ut labore et <b>dolore</b> magna aliquyam <blockquote><p>erat <mark>world</mark></p></blockquote>, sed diam voluptua. At <mark>world</mark> vero eos et accusam et justo duo dolores et ea rebum. Stet <p>clita <mark>world</mark> kasd </p>gubergren, no sea takimata sanctus est Lorem ipsum dolor sit <b><mark>world</mark> amet</b>.</p>";
 
 
-		var selection = window.getSelection();
-		selection.removeAllRanges();
-		root.innerHTML = input;
-		selection.removeAllRanges();
-		var textNode = root.firstChild.firstChild;
-		var range = document.createRange();
-		range.setStart(textNode, 0);
-		range.setEnd(textNode, bar.length);
-		selection.addRange(range);
+			var selection = window.getSelection();
+			selection.removeAllRanges();
+			root.innerHTML = input;
+			selection.removeAllRanges();
+			var textNode = root.firstChild.firstChild;
+			var range = document.createRange();
+			range.setStart(textNode, 0);
+			range.setEnd(textNode, bar.length);
+			selection.addRange(range);
 
-		mmw.updateSelection(null, root);
-		var expected = output;
-		var actual = root.innerHTML;
-		expect(expected).to.equal(actual);
-	});
-});
-
-describe('RestoreUncheckedState', function () {
-	it('change tdd1 to tdd1b on using highlight function', function() {
-		var input = _htmlFiles['tdd1.html'];
-		var expected = _htmlFiles['tdd1b.html'];
-		var actual = todo
+			mmw.updateSelection(null, root);
+			var expected = output;
+			var actual = root.innerHTML;
+			expect(expected).to.equal(actual);
+		});
 	});
 });
+
+/*
+describe("RestoreUncheckedState", function () {
+	it("change tdd1 to tdd1b on using highlight function", function() {
+		var input = _htmlFiles["tdd1.html"];
+		var expected = _htmlFiles["tdd1b.html"];
+		var actual = todo;
+	});
+})
+*/

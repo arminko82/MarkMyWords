@@ -120,7 +120,7 @@ class MarkMyWords {
 		if(dom == null)
 			dom = document;
 		var master = node.parentNode;
-		master.removeChild(node); ich denke hier werden mehrere kinder möglch sein, deshalb reversing
+		master.removeChild(node); //ich denke hier werden mehrere kinder möglch sein, deshalb reversing
 		MarkMyWords._highlights[master] = node;
 		for(var item of splits) {
 			master.appendChild(item === null ?
@@ -150,12 +150,12 @@ class MarkMyWords {
 		function searcher(node, result) {
 			for(var child of node.childNodes) {
 				switch(child.nodeType) {
-					case ELEM_NODE:
-						searcher(child, result);
-						break;
-					case TEXT_NODE:
-						result.push(child);
-						break;
+				case ELEM_NODE:
+					searcher(child, result);
+					break;
+				case TEXT_NODE:
+					result.push(child);
+					break;
 				}
 			}
 		}
@@ -184,18 +184,20 @@ MarkMyWords._highlights = [];
 MarkMyWords._lastText = "";
 
 //set default value if was never set before (is there a setup routine for a chrome extension?)
-if(chrome !== undefined && chrome.storage !== undefined) {
-	chrome.storage.local.get(ENABLED_ID, function (v){
-		var value = v[ENABLED_ID];
-		if (value === undefined)
-			chrome.storage.local.set({[ENABLED_ID]: true});
-	});
+if(typeof chrome !== "undefined") {
+	if(chrome !== undefined && chrome.storage !== undefined) {
+		chrome.storage.local.get(ENABLED_ID, function (v){
+			var value = v[ENABLED_ID];
+			if (value === undefined)
+				chrome.storage.local.set({[ENABLED_ID]: true});
+		});
+	}
 }
 
 //global init
-if(typeof document !== 'undefined') { // not defined in test env
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', afterDOMLoaded);
+if(typeof document !== "undefined") { // not defined in test env
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", afterDOMLoaded);
 	} else {
 		afterDOMLoaded();
 	}
@@ -208,6 +210,6 @@ function afterDOMLoaded() {
 }
 
 //render this class requireable
-if(typeof module !== 'undefined') {
+if(typeof module !== "undefined") {
 	module.exports = MarkMyWords;
 }

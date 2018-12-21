@@ -1,7 +1,7 @@
 {
   "name": "MarkMyWords",
   "version": "1.0.0",
-  "description": "By Armin Koefler, 29.09.2017",
+  "description": "After the user marks a word all other occurences highlight as well",
   "main": "main.js",
   "scripts": {
     "test": "mocha --reporter=nyan test/main-spec.js"
@@ -11,17 +11,17 @@
     "url": "git+https://github.com/arminko82/MarkMyWords.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Armin Koefler",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/arminko82/MarkMyWords/issues"
   },
   "homepage": "https://github.com/arminko82/MarkMyWords#readme",
   "devDependencies": {
-  	"chai" : "*",
-  	"mocha": "*",
+    "chai": "*",
     "jsdom": "11.3.0",
     "jsdom-global": "3.0.2",
+    "mocha": "*",
     "mocha-jsdom": "^1.1.0"
   }
 }
